@@ -162,6 +162,23 @@
   }
   .hint.is-visible { display: block; }
   .hint p { margin: 0; }
+  .browser-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--burgundy);
+    color: var(--burgundy);
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+  }
+  .browser-btn:focus-visible {
+    outline: 3px solid var(--brass);
+    outline-offset: 3px;
+  }
   .hint p + p { margin-top: 6px; color: var(--graphite-soft); }
   .dots {
     display: inline-block;
@@ -208,8 +225,9 @@
       </div>
 
       <div id="hint" class="hint" role="status">
-        <p>WhatsApp не открылся? Нажмите <span class="dots">⋯</span> в правом верхнем углу и выберите «Открыть в браузере».</p>
-        <p>Или скопируйте номер и напишите нам в WhatsApp.</p>
+        <a id="open-browser" class="browser-btn" href="#">Открыть в браузере</a>
+        <p>Если WhatsApp не открывается, откройте эту страницу в браузере. Или нажмите <span class="dots">⋯</span> в правом верхнем углу и выберите «Открыть в браузере».</p>
+        <p>Также можно скопировать номер и написать нам в WhatsApp.</p>
       </div>
     </div>
 
@@ -240,19 +258,23 @@
     link.href = "whatsapp://send?phone=" + PHONE;
   }
 
-  // Если после нажатия страница осталась на экране, значит переход не сработал
+  // Во встроенном браузере сразу показываем кнопку «Открыть в браузере»
   if (inApp) {
-    link.addEventListener("click", function () {
-      var left = false;
-      var onHide = function () { left = true; };
-      document.addEventListener("visibilitychange", onHide, { once: true });
-      window.addEventListener("pagehide", onHide, { once: true });
-      setTimeout(function () {
-        if (!left && document.visibilityState === "visible") {
-          hint.classList.add("is-visible");
-        }
-      }, 1800);
-    });
+    hint.classList.add("is-visible");
+    var openBtn = document.getElementById("open-browser");
+    var here = location.host + location.pathname;
+
+    if (isAndroid) {
+      // Открывает эту же страницу в Chrome, а если его нет — в браузере по умолчанию
+      openBtn.href = "intent://" + here +
+        "#Intent;scheme=https;package=com.android.chrome;" +
+        "S.browser_fallback_url=" + encodeURIComponent("https://" + here) + ";end";
+    } else if (isIOS) {
+      // Открывает эту же страницу в Safari
+      openBtn.href = "x-safari-https://" + here;
+    } else {
+      openBtn.style.display = "none";
+    }
   }
 
   // Копирование номера (с запасным способом для встроенных браузеров)
