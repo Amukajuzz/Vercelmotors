@@ -125,12 +125,6 @@
   }
   .btn-wa { background: var(--burgundy); color: #fff; }
   .btn-wa:hover { background: var(--burgundy-press); }
-  .btn-out {
-    min-height: 52px;
-    font-size: 16px;
-    border: 2px solid var(--burgundy);
-    color: var(--burgundy);
-  }
   .btn:focus-visible, .copy-btn:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
   .wa-icon {
     flex: none; width: 30px; height: 30px; border-radius: 50%;
@@ -168,7 +162,6 @@
         </span>
         Написать в WhatsApp
       </a>
-      <a id="out-btn" class="btn btn-out hidden" href="#">Открыть в браузере</a>
       <div class="phone-row">
         <span class="phone">+7 705 555 73 72</span>
         <button id="copy-btn" class="copy-btn" type="button">Скопировать</button>
@@ -182,15 +175,12 @@
 (function () {
   var w = window.__wa;
   var waBtn = document.getElementById("wa-btn");
-  var outBtn = document.getElementById("out-btn");
   var note = document.getElementById("note");
 
   if (w.isAndroid) waBtn.href = w.intent;
   else if (w.isIOS) waBtn.href = w.scheme;
 
   if (w.inApp && (w.isAndroid || w.isIOS)) {
-    outBtn.href = w.isAndroid ? w.escapeAndroid : w.escapeIOS;
-    outBtn.classList.remove("hidden");
     note.classList.remove("hidden");
   }
 
